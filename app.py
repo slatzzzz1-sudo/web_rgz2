@@ -9,7 +9,7 @@ from os import path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'recipe-secret-key-dimasam-2025')
-app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')  # postgres или sqlite
+app.config['DB_TYPE'] = 'sqlite'
 
 def db_connect():
     if current_app.config['DB_TYPE'] == 'postgres':
@@ -21,7 +21,7 @@ def db_connect():
         )
         cur = conn.cursor(cursor_factory=RealDictCursor)
     else:
-        # SQLite
+        # SQLite на pythonanywhere
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database2.db")
         conn = sqlite3.connect(db_path)
