@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить аккаунт - Рецепты{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>⚠️ Удаление аккаунта</h2>
+    <div class="warning">
+        <p><strong>Внимание!</strong> Это действие необратимо. Все ваши данные будут удалены.</p>
+    </div>
+    
+    <form method="POST">
+        <p>Вы уверены, что хотите удалить аккаунт <strong>{{ session.login }}</strong>?</p>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="confirm" value="yes" required>
+                Я подтверждаю удаление аккаунта
+            </label>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
+            <a href="{{ url_for('recipes') }}" class="btn">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.warning { background: #fed7d7; border: 1px solid #fc8181; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; }
+</style>
+{% endblock %}

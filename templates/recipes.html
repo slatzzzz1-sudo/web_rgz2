@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Все рецепты - Рецепты{% endblock %}
+
+{% block content %}
+<h2>📚 Все рецепты</h2>
+
+<div class="recipes-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card">
+        {% if recipe.image_path %}
+        <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
+        {% else %}
+        <div class="no-image">📷</div>
+        {% endif %}
+        <h3>{{ recipe.title }}</h3>
+        {% if recipe.category_name %}
+        <span class="category">{{ recipe.category_name }}</span>
+        {% endif %}
+        <p>{{ recipe.description[:100] }}...</p>
+        <div class="recipe-meta">
+            <span class="time">{{ recipe.cooking_time }} мин</span>
+            <span class="servings">×{{ recipe.servings }}</span>
+            <span class="ingredients">{{ recipe.ingredients_count or 0 }} ингр.</span>
+        </div>
+        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn">Подробнее</a>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.category { background: #48bb78; color: white; padding: 0.2rem 0.6rem; border-radius: 15px; font-size: 0.8rem; }
+.recipe-meta { display: flex; gap: 1rem; padding: 0 1rem 1rem; font-size: 0.9rem; color: #666; }
+.servings { color: #ed8936; }
+.ingredients { color: #667eea; }
+</style>
+{% endblock %}

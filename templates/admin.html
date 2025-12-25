@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Админ панель - Рецепты{% endblock %}
+
+{% block content %}
+<h2>⚙️ Админ панель</h2>
+
+<h3>Добавить рецепт</h3>
+<form method="POST" action="{{ url_for('add_recipe') }}" class="form-container">
+    <div class="form-group">
+        <label>Название:</label>
+        <input type="text" name="title" required>
+    </div>
+    <div class="form-group">
+        <label>Описание:</label>
+        <textarea name="description" rows="3"></textarea>
+    </div>
+    <div class="form-row">
+        <div class="form-group" style="width: 48%;">
+            <label>Время приготовления (мин):</label>
+            <input type="number" name="cooking_time" min="1" required>
+        </div>
+        <div class="form-group" style="width: 48%;">
+            <label>Порции:</label>
+            <input type="number" name="servings" min="1" value="1">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group" style="width: 48%;">
+            <label>Категория:</label>
+            <select name="category_id" required>
+                <option value="1">Завтраки</option>
+                <option value="2">Обеды</option>
+                <option value="3">Ужины</option>
+                <option value="4">Десерты</option>
+                <option value="5">Закуски</option>
+            </select>
+        </div>
+        <div class="form-group" style="width: 48%;">
+            <label>Картинка (имя файла):</label>
+            <input type="text" name="image_path" placeholder="картинка1.jpg">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Добавить рецепт</button>
+</form>
+
+<h3>Управление рецептами</h3>
+<div class="recipes-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card admin-recipe">
+        <h4>{{ recipe.title }}</h4>
+        <p>{{ recipe.description[:100] }}...</p>
+        <form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" style="display: inline;">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить?')">Удалить</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.admin-recipe { grid-template-rows: auto 1fr auto; }
+.btn-danger { background: #f56565; }
+.btn-danger:hover { background: #e53e3e; }
+</style>
+{% endblock %}

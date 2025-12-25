@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Рецепты{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🍳 Кулинарная Книга</h1>
+            <div class="user-info">
+                {% if session.login %}
+                    Привет, {{ session.login }}! 
+                    <a href="{{ url_for('recipes') }}">Рецепты</a> |
+                    <a href="{{ url_for('search') }}">Поиск</a> |
+                    {% if session.is_admin %}
+                        <a href="{{ url_for('admin') }}">Админ</a> |
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}">Выход</a> |
+                    <a href="{{ url_for('delete_account') }}">Удалить аккаунт</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Войти</a> |
+                    <a href="{{ url_for('register') }}">Регистрация</a>
+                {% endif %}
+            </div>
+            <div class="student-info">{{ student_info }}</div>
+        </div>
+    </header>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

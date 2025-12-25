@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h2>Популярные рецепты</h2>
+    <p>Выберите блюдо и начните готовить!</p>
+    {% if not session.login %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Войти для просмотра рецептов</a>
+    {% endif %}
+</div>
+
+<div class="recipes-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card">
+        {% if recipe.image_path %}
+        <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
+        {% else %}
+        <div class="no-image">📷</div>
+        {% endif %}
+        <h3>{{ recipe.title }}</h3>
+        <p>{{ recipe.description[:100] }}...</p>
+        <span class="time">{{ recipe.cooking_time }} мин</span>
+        {% if session.login %}
+        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn">Подробнее</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

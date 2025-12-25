@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Поиск рецептов - Рецепты{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <h2>🔍 Поиск рецептов</h2>
+    
+    <form method="POST" class="search-form">
+        <div class="form-group">
+            <label>Ключевые слова (название или ингредиенты):</label>
+            <input type="text" name="keywords" placeholder="курица рис омлет" style="width: 70%;">
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="width: 48%;">
+                <label>Режим поиска:</label>
+                <select name="mode">
+                    <option value="any">Хоть один ингредиент</option>
+                    <option value="all">Все ингредиенты</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 48%; margin-top: 1.5rem;">🔍 Найти</button>
+        </div>
+    </form>
+
+    {% if recipes %}
+    <h3>Найдено рецептов: {{ recipes|length }}</h3>
+    <div class="recipes-grid">
+        {% for recipe in recipes %}
+        <div class="recipe-card">
+            {% if recipe.image_path %}
+            <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
+            {% else %}
+            <div class="no-image">📷</div>
+            {% endif %}
+            <h3>{{ recipe.title }}</h3>
+            <p>{{ recipe.description[:80] }}...</p>
+            <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn">Подробнее</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.search-form { max-width: 600px; }
+.form-row { display: flex; gap: 4%; }
+</style>
+{% endblock %}
