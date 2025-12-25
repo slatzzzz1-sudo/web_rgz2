@@ -262,64 +262,33 @@ def search():
         return redirect(url_for('login'))
     
     recipes = []
+    
     if request.method == 'POST':
-        keywords = [kw.strip() for kw in request.form.get('keywords', '').lower().split() if kw.strip()]
-        search_mode = request.form.get('mode', 'any')
-        
-        conn, cur = db_connect()
-        if keywords:
-            if search_mode == 'all' and len(keywords) > 1:
-                # Все ингредиенты должны быть
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    query = """
-                        SELECT DISTINCT r.*, c.name as category_name
-                        FROM recipes r 
-                        LEFT JOIN categories c ON r.category_id = c.id
-                        JOIN recipe_ingredients ri ON r.id = ri.recipe_id
-                        JOIN ingredients i ON ri.ingredient_id = i.id
-                        WHERE LOWER(r.title) LIKE %s OR LOWER(i.name) LIKE %s
-                        GROUP BY r.id, c.name
-                        HAVING COUNT(DISTINCT i.id) >= %s
-                    """
-                    cur.execute(query, ('%' + '%'.join(keywords) + '%', '%' + '%'.join(keywords) + '%', len(keywords)))
-                else:
-                    # SQLite упрощенный поиск
-                    conditions = ' OR '.join(["LOWER(r.title) LIKE ?" for _ in keywords])
-                    args = tuple(['%' + kw + '%' for kw in keywords])
-                    cur.execute(f"""
-                        SELECT DISTINCT r.*, c.name as category_name
-                        FROM recipes r 
-                        LEFT JOIN categories c ON r.category_id = c.id
-                        WHERE {conditions}
-                        ORDER BY r.title
-                    """, args)
+        keyword = request.form.get('keywords', '').strip()
+        if keyword:
+            conn, cur = db_connect()
+            
+            # ПРОСТОЙ поиск по названию рецепта
+            search_term = f'%{keyword.lower()}%'
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("""
+                    SELECT r.*, c.name as category_name
+                    FROM recipes r 
+                    LEFT JOIN categories c ON r.category_id = c.id
+                    WHERE LOWER(r.title) LIKE %s
+                    ORDER BY r.title
+                """, (search_term,))
             else:
-                # Хоть один ингредиент
-                conditions = ' OR '.join(["LOWER(r.title) LIKE ? OR LOWER(i.name) LIKE ?"] * len(keywords))
-                args = tuple(['%' + kw + '%' for kw in keywords] * 2)
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    cur.execute(f"""
-                        SELECT DISTINCT r.*, c.name as category_name
-                        FROM recipes r 
-                        LEFT JOIN categories c ON r.category_id = c.id
-                        LEFT JOIN recipe_ingredients ri ON r.id = ri.recipe_id
-                        LEFT JOIN ingredients i ON ri.ingredient_id = i.id
-                        WHERE {conditions}
-                        ORDER BY r.title
-                    """, args)
-                else:
-                    conditions = ' OR '.join(["LOWER(r.title) LIKE ?"] * len(keywords))
-                    args = tuple(['%' + kw + '%' for kw in keywords])
-                    cur.execute(f"""
-                        SELECT DISTINCT r.*, c.name as category_name
-                        FROM recipes r 
-                        LEFT JOIN categories c ON r.category_id = c.id
-                        WHERE {conditions}
-                        ORDER BY r.title
-                    """, args)
+                cur.execute("""
+                    SELECT r.*, c.name as category_name
+                    FROM recipes r 
+                    LEFT JOIN categories c ON r.category_id = c.id
+                    WHERE LOWER(r.title) LIKE ?
+                    ORDER BY r.title
+                """, (search_term,))
             
             recipes = cur.fetchall()
-        db_close(conn, cur)
+            db_close(conn, cur)
     
     return render_template('search.html', recipes=recipes, student_info=STUDENT_INFO)
 

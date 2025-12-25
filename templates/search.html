@@ -6,23 +6,13 @@
 <div class="search-page">
     <h2>🔍 Поиск рецептов</h2>
     
-    <form method="POST" class="search-form">
-        <div class="form-group">
-            <label>Ключевые слова (название или ингредиенты):</label>
-            <input type="text" name="keywords" placeholder="курица рис омлет" style="width: 70%;">
-        </div>
-        <div class="form-row">
-            <div class="form-group" style="width: 48%;">
-                <label>Режим поиска:</label>
-                <select name="mode">
-                    <option value="any">Хоть один ингредиент</option>
-                    <option value="all">Все ингредиенты</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 48%; margin-top: 1.5rem;">🔍 Найти</button>
-        </div>
-    </form>
-
+<form method="POST" class="search-form">
+    <div class="form-group">
+        <label>Поиск по названию рецепта:</label>
+        <input type="text" name="keywords" placeholder="введите название или ингредиент">
+    </div>
+    <button type="submit" class="btn btn-primary">🔍 Найти</button>
+</form>
     {% if recipes %}
     <h3>Найдено рецептов: {{ recipes|length }}</h3>
     <div class="recipes-grid">
