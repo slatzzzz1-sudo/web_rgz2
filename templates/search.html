@@ -6,34 +6,53 @@
 <div class="search-page">
     <h2>🔍 Поиск рецептов</h2>
     
-<form method="POST" class="search-form">
+<form method="POST" action="{{ url_for('search') }}" class="search-form">
     <div class="form-group">
         <label>Поиск по названию рецепта:</label>
-        <input type="text" name="keywords" placeholder="введите название или ингредиент">
+        <input type="text" name="keyword" placeholder="например: борщ, паста" value="{{ keyword|default('') }}">
     </div>
-    <button type="submit" class="btn btn-primary">🔍 Найти</button>
+
+    <div class="form-group">
+        <label>Поиск по ингредиентам (через запятую):</label>
+        <input type="text" name="ingredients" placeholder="например: курица, рис, морковь" value="{{ ingredients|default('') }}">
+    </div>
+
+    <div class="form-group">
+        <label>Режим поиска по ингредиентам:</label>
+        <select name="mode">
+            <option value="any" {% if mode == 'any' or not mode %}selected{% endif %}>Хотя бы один из ингредиентов</option>
+            <option value="all" {% if mode == 'all' %}selected{% endif %}>Все указанные ингредиенты обязательно</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">🔍 Найти рецепты</button>
 </form>
+
     {% if recipes %}
-    <h3>Найдено рецептов: {{ recipes|length }}</h3>
-    <div class="recipes-grid">
-        {% for recipe in recipes %}
-        <div class="recipe-card">
-            {% if recipe.image_path %}
-            <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
-            {% else %}
-            <div class="no-image">📷</div>
-            {% endif %}
-            <h3>{{ recipe.title }}</h3>
-            <p>{{ recipe.description[:80] }}...</p>
-            <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn">Подробнее</a>
+        <h3>Найдено рецептов: {{ recipes|length }}</h3>
+        <div class="recipes-grid">
+            {% for recipe in recipes %}
+            <div class="recipe-card">
+                {% if recipe.image_path %}
+                <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
+                {% else %}
+                <div class="no-image">🍳</div>
+                {% endif %}
+                <h3>{{ recipe.title }}</h3>
+                <p>{{ recipe.description|default('', true)|truncate(100) }}</p>
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn">Подробнее</a>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    {% elif request.method == 'POST' %}
+        <p style="color: #888; font-style: italic;">😔 Ничего не найдено. Попробуйте изменить запрос.</p>
     {% endif %}
 </div>
 
 <style>
-.search-form { max-width: 600px; }
-.form-row { display: flex; gap: 4%; }
+.search-form { max-width: 700px; margin: 0 auto 40px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
 </style>
 {% endblock %}

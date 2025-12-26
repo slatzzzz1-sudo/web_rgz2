@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать рецепт - {{ recipe.title }}{% endblock %}
+
+{% block content %}
+<h2>✏️ Редактирование рецепта: {{ recipe.title }}</h2>
+
+<form method="POST" class="form-container">
+    <div class="form-group">
+        <label>Название:</label>
+        <input type="text" name="title" value="{{ recipe.title }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Описание:</label>
+        <textarea name="description" rows="3">{{ recipe.description or '' }}</textarea>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group" style="width: 48%;">
+            <label>Время приготовления (мин):</label>
+            <input type="number" name="cooking_time" value="{{ recipe.cooking_time }}" min="1" required>
+        </div>
+        <div class="form-group" style="width: 48%;">
+            <label>Порции:</label>
+            <input type="number" name="servings" value="{{ recipe.servings }}" min="1" required>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group" style="width: 48%;">
+            <label>Категория:</label>
+            <select name="category_id" required>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if cat.id == recipe.category_id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="width: 48%;">
+            <label>Картинка (имя файла):</label>
+            <input type="text" name="image_path" value="{{ recipe.image_path or '' }}" placeholder="borsch.jpg">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Ингредиенты (один на строку через ;):</label>
+        <textarea name="ingredients" rows="6">{{ ingredients_str }}</textarea>
+        <small>Формат: Картофель g:300; Морковь pcs:2; Свекла pcs:1</small>
+    </div>
+
+    <div class="form-group">
+        <label>Шаги приготовления:</label>
+        <textarea name="steps" rows="8">{{ steps_str }}</textarea>
+        <small>Разделяйте шаги точкой с запятой (;)</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">💾 Сохранить изменения</button>
+    <a href="{{ url_for('admin') }}" class="btn">Отмена</a>
+</form>
+
+<style>
+.form-container { max-width: 900px; margin: 40px auto; }
+</style>
+{% endblock %}

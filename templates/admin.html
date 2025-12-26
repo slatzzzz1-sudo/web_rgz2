@@ -5,16 +5,18 @@
 {% block content %}
 <h2>⚙️ Админ панель</h2>
 
-<h3>Добавить рецепт</h3>
+<h3>📝 Добавить новый рецепт</h3>
 <form method="POST" action="{{ url_for('add_recipe') }}" class="form-container">
     <div class="form-group">
         <label>Название:</label>
-        <input type="text" name="title" required>
+        <input type="text" name="title" required placeholder="Например: Борщ классический">
     </div>
+
     <div class="form-group">
         <label>Описание:</label>
-        <textarea name="description" rows="3"></textarea>
+        <textarea name="description" rows="3" placeholder="Краткое описание блюда..."></textarea>
     </div>
+
     <div class="form-row">
         <div class="form-group" style="width: 48%;">
             <label>Время приготовления (мин):</label>
@@ -22,44 +24,72 @@
         </div>
         <div class="form-group" style="width: 48%;">
             <label>Порции:</label>
-            <input type="number" name="servings" min="1" value="1">
+            <input type="number" name="servings" min="1" value="4" required>
         </div>
     </div>
+
     <div class="form-row">
         <div class="form-group" style="width: 48%;">
             <label>Категория:</label>
             <select name="category_id" required>
-                <option value="1">Завтраки</option>
-                <option value="2">Обеды</option>
-                <option value="3">Ужины</option>
-                <option value="4">Десерты</option>
-                <option value="5">Закуски</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="form-group" style="width: 48%;">
-            <label>Картинка (имя файла):</label>
-            <input type="text" name="image_path" placeholder="картинка1.jpg">
+            <label>Картинка (имя файла в static/images/):</label>
+            <input type="text" name="image_path" placeholder="borsch.jpg">
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Добавить рецепт</button>
+
+    <div class="form-group">
+        <label>Ингредиенты (формат: Название единица:количество; ...):</label>
+        <textarea name="ingredients" rows="4" placeholder="Пример: курица g:500; рис g:200; морковь pcs:2; лук pcs:1"></textarea>
+        <small>Пример: картофель g:400; свекла pcs:2; капуста g:300</small>
+    </div>
+
+    <div class="form-group">
+        <label>Шаги приготовления (по одному на строку, через ;):</label>
+        <textarea name="steps" rows="5" placeholder="Нарезать овощи; Обжарить лук; Добавить мясо и тушить..."></textarea>
+        <small>Разделяйте шаги точкой с запятой: Шаг 1; Шаг 2; Шаг 3</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">✅ Добавить рецепт</button>
 </form>
 
-<h3>Управление рецептами</h3>
+<hr style="margin: 50px 0;">
+
+<h3>📋 Управление существующими рецептами</h3>
 <div class="recipes-grid">
     {% for recipe in recipes %}
     <div class="recipe-card admin-recipe">
+        {% if recipe.image_path %}
+        <img src="{{ url_for('static', filename='images/' + recipe.image_path) }}" alt="{{ recipe.title }}">
+        {% else %}
+        <div class="no-image">🍲</div>
+        {% endif %}
         <h4>{{ recipe.title }}</h4>
-        <p>{{ recipe.description[:100] }}...</p>
-        <form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" style="display: inline;">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить?')">Удалить</button>
-        </form>
+        <p><strong>Категория:</strong> {{ recipe.category_name }}</p>
+        <p>{{ recipe.description|default('', true)|truncate(120) }}</p>
+        
+        <div class="admin-actions">
+            <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-edit">✏️ Редактировать</a>
+            <form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" style="display: inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Точно удалить рецепт «{{ recipe.title }}»?')">🗑️ Удалить</button>
+            </form>
+        </div>
     </div>
     {% endfor %}
 </div>
 
 <style>
-.admin-recipe { grid-template-rows: auto 1fr auto; }
-.btn-danger { background: #f56565; }
-.btn-danger:hover { background: #e53e3e; }
+.form-container { max-width: 900px; margin: 0 auto 40px; }
+.form-group small { display: block; margin-top: 6px; color: #666; font-style: italic; }
+.admin-actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-edit { background: #4299e1; }
+.btn-edit:hover { background: #3182ce; }
+.admin-recipe { position: relative; padding-bottom: 80px; }
+.admin-actions { position: absolute; bottom: 15px; left: 15px; right: 15px; }
 </style>
 {% endblock %}
